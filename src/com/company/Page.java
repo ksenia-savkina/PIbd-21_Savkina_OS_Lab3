@@ -42,7 +42,7 @@ public class Page {
     }
 
     public String print() {
-        String str = "Страница с номером " + process.getProcessNumber() + " иденцифицируется номером " + physicalPageNumber + "\n";
+        String str = "Страница иденцифицируется номером " + physicalPageNumber + "\n";
         if (isInPhysicalMemory()) {
             str += "Располагается в физической памяти\n";
             for (int i = 0; i < pageSize; i++) {

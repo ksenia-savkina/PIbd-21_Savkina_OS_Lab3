@@ -42,7 +42,7 @@ public class PageTable {
         }
     }
 
-    private int unloadPage(Page page) {
+    public int unloadPage(Page page) {
         int physicalMemoryNumber = page.getPhysicalPageNumber();
         if (!virtualPages.containsKey(page)) {
             virtualPages.put(page, new byte[pageSize]);
@@ -71,7 +71,7 @@ public class PageTable {
         }
     }
 
-    private int getFreePhysicalPageCount() {
+    public int getFreePhysicalPageCount() {
         int k = 0;
         for (int i = 0; i < physicalPages.length; i++) {
             if (physicalPages[i] == null) {
@@ -81,7 +81,7 @@ public class PageTable {
         return k;
     }
 
-    private int getAccessiblePhysicalPageNumber() {
+    public int getAccessiblePhysicalPageNumber() {
         for (int i = 0; i < physicalPages.length; i++) {
             if (physicalPages[i] == null)
                 return i;
@@ -103,50 +103,12 @@ public class PageTable {
         }
     }
 
-    private List<Page> countPhysicalMemory(Process process, int pageCount) {
-        List<Page> resultList = new ArrayList<Page>();
-        for (int i = 0; i < pageCount; i++) {
-            int accessiblePageNumber = getAccessiblePhysicalPageNumber();
-            Page page = new Page(bits, this, process, accessiblePageNumber);
-            resultList.add(page);
-            physicalPages[accessiblePageNumber] = page;
-            clear(page);
-        }
-        return resultList;
-    }
-
-    private void clear(Page page) {
+    public void clear(Page page) {
         if (page.isInPhysicalMemory()) {
             for (int i = 0; i < pageSize; i++) {
                 int physicalPosition = i + page.getPhysicalPageNumber() * pageSize;
                 physicalMemory[physicalPosition] = 0;
             }
-        }
-    }
-
-    public List<Page> countMemory(Process process) {
-        double pageCountDiv = process.getMemoryNumber() / pageSize;
-        int pageCountMod = process.getMemoryNumber() % pageSize;
-        int pageCountTotal = (int) pageCountDiv;
-        if (pageCountMod > 0) {
-            pageCountTotal++;
-        }
-        if (getFreePhysicalPageCount() >= pageCountTotal) {
-            List<Page> memoryPages = countPhysicalMemory(process, pageCountTotal);
-            return memoryPages;
-        } else {
-            ArrayList<Page> memoryPages = new ArrayList<Page>();
-            int physicalPageCount = getFreePhysicalPageCount();
-            List<Page> pages = countPhysicalMemory(process, physicalPageCount);
-            memoryPages.addAll(pages);
-            for (int i = 0; i < pageCountTotal - physicalPageCount; i++) {
-                int physicalID = unloadPage(getUsedPage());
-                Page memoryPage = new Page(bits, this, process, physicalID);
-                memoryPages.add(memoryPage);
-                physicalPages[physicalID] = memoryPage;
-                clear(memoryPage);
-            }
-            return memoryPages;
         }
     }
 
@@ -158,37 +120,23 @@ public class PageTable {
             virtualPages.remove(page);
     }
 
-    public String statusPhysicalMemory() {
-        String str = "Состояние физической памяти: \n";
-        for (int i = 0; i < physicalPages.length; i++) {
-            if (physicalPages[i] == null) {
-                str += "Страница свободна\n";
-                for (int j = 0; j < pageSize; j++) {
-                    str += physicalMemory[j + pageSize * i] + " ";
-                    if ((j + 1) % bits == 0)
-                        str += "\n";
-                }
-            } else
-                str += physicalPages[i].print();
-        }
-        return str;
+    public int getBits() {
+        return bits;
     }
 
-    public String statusVirtualMemory() {
-        String str = "Состояние файла подкачки: \n";
-        Set<Page> pages = virtualPages.keySet();
-        Iterator<Page> pageIterator = pages.iterator();
-        while (pageIterator.hasNext()) {
-            Page page = pageIterator.next();
-            if (!page.isInPhysicalMemory())
-                str += page.print();
-        }
-        str += "\n";
-        return str;
+    public Page[] getPhysicalPages(){
+        return physicalPages;
+    }
+
+    public byte[] getPhysicalMemory() {
+        return physicalMemory;
     }
 
     public static int getSize() {
         return pageSize;
     }
 
+    public HashMap<Page, byte[]> getVirtualPages() {
+        return virtualPages;
+    }
 }

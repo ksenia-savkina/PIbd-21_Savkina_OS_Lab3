@@ -6,30 +6,29 @@ public class Main {
 
     public static void main(String[] args) {
 
-        PageTable pageTable = new PageTable();
         MemoryManagement memoryManagement = new MemoryManagement();
-        Process process = new Process(pageTable);
+        Process process = new Process(memoryManagement);
         System.out.println(memoryManagement.performance());
-        System.out.println(pageTable.statusPhysicalMemory());
-        System.out.println(pageTable.statusVirtualMemory());
+        System.out.println(memoryManagement.statusPhysicalMemory());
+        System.out.println(memoryManagement.statusVirtualMemory());
         String str = "yes";
 
         while (str.equals("yes")) {
             System.out.println(memoryManagement.continuation());
-            str = resume(str);
+            str = resume();
             if (str.equals("no")) break;
-            System.out.println(pageTable.statusPhysicalMemory());
-            str = resume(str);
+            System.out.println(memoryManagement.statusPhysicalMemory());
+            str = resume();
             if (str.equals("no")) break;
-            System.out.println(pageTable.statusVirtualMemory());
-            str = resume(str);
+            System.out.println(memoryManagement.statusVirtualMemory());
+            str = resume();
         }
         System.out.println("Страницы в виртуальной памяти: " + process.pagesInVirtualMemory());
     }
 
-    private static String resume(String str){
+    private static String resume(){
         Scanner scanner = new Scanner(System.in);
         System.out.println("Для продолжения введите yes, для выхода no:");
-        return  str = scanner.nextLine();
+        return scanner.nextLine();
     }
 }
