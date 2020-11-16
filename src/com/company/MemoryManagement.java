@@ -10,7 +10,6 @@ public class MemoryManagement {
     private int k;
     private boolean launch;
     private boolean pageIsDeleted;
-    private final int memoryNumber;
     private int tasksNumber;
 
     public MemoryManagement() {
@@ -21,7 +20,6 @@ public class MemoryManagement {
         k = 0;
         launch = false;
         pageIsDeleted = false;
-        memoryNumber = rnd.nextInt(64) + 64;
         tasksNumber = rnd.nextInt(3) + 4;
     }
 
@@ -88,8 +86,9 @@ public class MemoryManagement {
     }
 
     public List<Page> countMemory(Process process) {
-        double pageCountDiv = memoryNumber /  pageTable.getSize();
-        int pageCountMod = memoryNumber %  pageTable.getSize();
+        Random rnd = new Random();
+        double pageCountDiv =  rnd.nextInt(64) + 64 /  pageTable.getSize();
+        int pageCountMod =  rnd.nextInt(64) + 64 %  pageTable.getSize();
         int pageCountTotal = (int) pageCountDiv;
         if (pageCountMod > 0) {
             pageCountTotal++;
